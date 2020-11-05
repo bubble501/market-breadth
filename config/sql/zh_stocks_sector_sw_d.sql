@@ -1,4 +1,6 @@
 -- 创建 tmp_zh_stocks_sw_sector_d view
+use stocks
+
 create view tmp_zh_stocks_sw_sector_d as
 select
    date

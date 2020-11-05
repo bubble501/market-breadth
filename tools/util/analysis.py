@@ -69,8 +69,12 @@ def is_over(x, px):
     else:
         return 'N'
 
+def shit(row):
+    import pdb; pdb.set_trace()
+
 
 def stock_gap_and_over(data):
+    # import pdb; pdb.set_trace()
     data[["date"]] = data[["date"]].astype(str)
     data['row_num'] = data.date.rank(method='min').astype(int)
     data_copy = data.copy()
@@ -85,25 +89,27 @@ def stock_gap_and_over(data):
     data = data.set_index(['code', 'row_num'])
     data_copy = data_copy.set_index(['code', 'row_num'])
     data = pd.merge(data, data_copy, how='left', on=['code', 'row_num'])
+    # import pdb; pdb.set_trace()
 
+    # data.apply(lambda row: shit(row), axis=1, raw=False)
     data['is_gap'] = data.apply(
         lambda row: is_gap(row['high'], row['low'], row['close'], row['pre_high'], row['pre_low'], row['pre_close']),
-        axis=1, raw=True)
+        axis=1, raw=False)
     data['is_esm_over'] = data.apply(
         lambda row: is_over(row['esm'], row['pesm']),
-        axis=1, raw=True)
+        axis=1, raw=False)
     data['is_eml_over'] = data.apply(
         lambda row: is_over(row['eml'], row['peml']),
-        axis=1, raw=True)
+        axis=1, raw=False)
     data['is_cs_over'] = data.apply(
         lambda row: is_over(row['cs'], row['pcs']),
-        axis=1, raw=True)
+        axis=1, raw=False)
     data['is_sm_over'] = data.apply(
         lambda row: is_over(row['sm'], row['psm']),
-        axis=1, raw=True)
+        axis=1, raw=False)
     data['is_ml_over'] = data.apply(
         lambda row: is_over(row['ml'], row['pml']),
-        axis=1, raw=True)
+        axis=1, raw=False)
     return data.reset_index()
 
 
@@ -133,7 +139,7 @@ def stock_turn_up(data, c, day):
     column = 'is_{}_up'.format(c)
     data[column] = data.apply(
         lambda row: is_turn_up(row['close'], row['pre_close'], row[close_ago], row[pre_close_ago]),
-        axis=1, raw=True)
+        axis=1, raw=False)
     return data.reset_index()
 
 
