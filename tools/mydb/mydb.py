@@ -17,8 +17,6 @@ class MyDB(object):
         self.charset = config.get('database', 'charset')
         self.url = 'mysql+pymysql://{}:{}@{}:{}/{}?charset={}'.format(self.user, self.password, self.host, self.port,
                                                                       self.db, self.charset)
-
-    def create_mydb(self):
         self.mydb = mycon.connect(
             host=self.host,  # 数据库主机地址
             port=self.port,
@@ -27,13 +25,14 @@ class MyDB(object):
             database=self.db,
             auth_plugin='mysql_native_password'
         )
+        self.db_engine = create_engine(self.url)
 
     # 1. upsert_table 写入或者更新表
     #    table_name ： 写入的表明
     #    sql_columns ：写入的列
     #    sql_df ： dataframe 数据集
     def upsert_table(self, table_name, sql_columns, sql_df):
-        self.create_mydb()
+        # self.create_mydb()
         mycursor = self.mydb.cursor()
         # `date` = VALUES(`date`)
         set_keys = map(lambda i: '`' + i + '` = VALUES(`' + i + '`)', sql_columns)
@@ -54,19 +53,16 @@ class MyDB(object):
         self.mydb.commit()
 
     def read_data(self, table_name, sql_columns):
-        db_engine = create_engine(self.url)
         # 记录在表中不存在则进行插入，如果存在则进行更新
         sql = '''
                 SELECT `{}` FROM `{}`;
             '''.format('`,`'.join(sql_columns), table_name)
-        return pd.read_sql(sql, db_engine)
+        return pd.read_sql(sql, self.db_engine)
 
     def read_from_sql(self, sql):
-        db_engine = create_engine(self.url)
-        return pd.read_sql(sql, db_engine)
+        return pd.read_sql(sql, self.db_engine)
 
     def truncate_table(self, table_name):
-        self.create_mydb()
         mycursor = self.mydb.cursor()
         # 记录在表中不存在则进行插入，如果存在则进行更新
         sql = '''

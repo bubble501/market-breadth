@@ -20,7 +20,7 @@ stk_codes = stk_info.code.copy()
 stk_info = stk_info.set_index(['code'])
 
 table = 'us_stocks_d'
-mydb.truncate_table(table)
+# mydb.truncate_table(table)
 
 columns = ['code', 'date', 'name', 'sector', 'sp_sector', 'industry', 'total_cap',
            'is_spx', 'spx_weight', 'is_ndx', 'ndx_weight', 'is_dji', 'dji_weight',
@@ -37,48 +37,89 @@ columns = ['code', 'date', 'name', 'sector', 'sp_sector', 'industry', 'total_cap
            'l_close', 'l_pre_close', 'is_l_up'
           ]
 # 获取日K线数据
-batch = 40
+batch = 20
 num = 0
-for n in range(0, len(stk_codes), batch):
-    num += 1
-    print('Processing 第 {} 批 【{}~{}/{}】...'.format(num, n, n+batch, len(stk_codes)))
-    sub_codes = stk_codes[n: n+batch]
-    symbol_list = ' '.join(sub_codes)
-    # data = yf.download(symbol_list, start=date.get_year_ago(), end=date.get_end_day(),
-    #                    group_by="ticker", threads=True, auto_adjust=True,
-    #                    interval='1d')
-    data = us.download(symbol_list=symbol_list, start=date.get_year_ago(), end=date.get_end_day(),
-                        interval='1d')
-    for i in sub_codes:
-        if i in data.columns:
-            stock = stk_info.loc[i]
-            df = data[i]
-            if df is None:
-                continue
-            df = df.tail(250)
-            df = df.reset_index()
-            df.rename(columns={'Date': 'date', 'Open': 'open', 'High': 'high', 'Low': 'low',
-                               'Close': 'close', 'Volume': 'vol'},
-                      inplace=True)
-            df = df[~np.isnan(df['close'])]
-            df['code'] = i
-            df = analysis.stock_analysis(df, 20, 60, 120)
-            if df is None:
-                continue
-            df['name'] = stock.get('name')
-            df['sector'] = stock.get('sector')
-            df['sp_sector'] = stock.get('sp_sector')
-            df['industry'] = stock.get('industry')
-            df['total_cap'] = stock.get('total_cap')
-            df['is_spx'] = stock.get('is_spx')
-            df['spx_weight'] = stock.get('spx_weight')
-            df['is_ndx'] = stock.get('is_ndx')
-            df['ndx_weight'] = stock.get('ndx_weight')
-            df['is_dji'] = stock.get('is_dji')
-            df['dji_weight'] = stock.get('dji_weight')
-            df = df[~np.isnan(df['l_close'])]
-            df = df[columns]
-            mydb.upsert_table(table, columns, df)
+total = len(stk_codes)
+count = 1
+for i in stk_codes:
+    try:
+        print(f"handle {i} {count}/{total}....")
+        count = count + 1
+        stock = stk_info.loc[i]
+        df = mydb.read_from_sql(f"select * from usshare_daily_ohlc where ts_code='{i}'")
+        if df is None or df.empty==True:
+            print(f"ERROR no ohlc found for {i}!!!!!!")
+            continue
+        df = df.tail(250)
+        # df = df.reset_index()
+        df.rename(columns={'trade_date': 'date'},
+                    inplace=True)
+
+
+        df = df[~np.isnan(df['close'])]
+
+        df['code'] = i
+        df = analysis.stock_analysis(df, 20, 60, 120)
+        if df is None:
+            continue
+        df['name'] = stock.get('name')
+        df['sector'] = stock.get('sector')
+        df['sp_sector'] = stock.get('sp_sector')
+        df['industry'] = stock.get('industry')
+        df['total_cap'] = stock.get('total_cap')
+        df['is_spx'] = stock.get('is_spx')
+        df['spx_weight'] = stock.get('spx_weight')
+        df['is_ndx'] = stock.get('is_ndx')
+        df['ndx_weight'] = stock.get('ndx_weight')
+        df['is_dji'] = stock.get('is_dji')
+        df['dji_weight'] = stock.get('dji_weight')
+        df = df[~np.isnan(df['l_close'])]
+        df = df[columns]
+        mydb.upsert_table(table, columns, df)
+    except Exception as e:
+        print(e)
+        
+
+# for n in range(0, len(stk_codes), batch):
+#     num += 1
+#     print('Processing 第 {} 批 【{}~{}/{}】...'.format(num, n, n+batch, len(stk_codes)))
+#     sub_codes = stk_codes[n: n+batch]
+#     symbol_list = ' '.join(sub_codes)
+#     # data = yf.download(symbol_list, start=date.get_year_ago(), end=date.get_end_day(),
+#     #                    group_by="ticker", threads=True, auto_adjust=True,
+#     #                    interval='1d')
+#     data = us.download(symbol_list=symbol_list, start="1980-01-01", end=date.get_end_day(),
+#                         interval='1d')
+#     for i in sub_codes:
+#         if i in data.columns:
+#             stock = stk_info.loc[i]
+#             df = data[i]
+#             if df is None:
+#                 continue
+#             df = df.tail(250)
+#             df = df.reset_index()
+#             df.rename(columns={'Date': 'date', 'Open': 'open', 'High': 'high', 'Low': 'low',
+#                                'Close': 'close', 'Volume': 'vol'},
+#                       inplace=True)
+#             df = df[~np.isnan(df['close'])]
+#             df['code'] = i
+#             df = analysis.stock_analysis(df, 20, 60, 120)
+#             if df is None:
+#                 continue
+#             df['name'] = stock.get('name')
+#             df['sector'] = stock.get('sector')
+#             df['sp_sector'] = stock.get('sp_sector')
+#             df['industry'] = stock.get('industry')
+#             df['total_cap'] = stock.get('total_cap')
+#             df['is_spx'] = stock.get('is_spx')
+#             df['spx_weight'] = stock.get('spx_weight')
+#             df['is_ndx'] = stock.get('is_ndx')
+#             df['ndx_weight'] = stock.get('ndx_weight')
+#             df['is_dji'] = stock.get('is_dji')
+#             df['dji_weight'] = stock.get('dji_weight')
+#             df = df[~np.isnan(df['l_close'])]
+#             df = df[columns]
+#             mydb.upsert_table(table, columns, df)
 
 end = datetime.now()
 print('Download Data use {}'.format(end - start))

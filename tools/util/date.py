@@ -52,7 +52,6 @@ def get_3month_ago(format="%Y-%m-%d"):
     month_ago = today + relativedelta(months=-3)
     return datetime.strftime(month_ago, format)
 
-
 def get_year_ago(format="%Y-%m-%d"):
     today = datetime.today()
     year_ago = today + relativedelta(years=-1)

@@ -40,6 +40,7 @@ columns = ['code', 'date', 'name', 'industry', 'sw_ind1', 'sw_ind1_weight', 'are
            ]
 # 获取日K线数据
 num = stk_codes.size
+stk_codes = []
 j = 0
 for i in stk_codes:
     j = j + 1
@@ -47,8 +48,7 @@ for i in stk_codes:
         print('processing [' + str(j) + '/' + str(num) + '] is None; Continue!')
         continue
     print('processing [' + str(j) + '/' + str(num) + '] : ' + i)
-    # df = zh.get_daily(ts_code=i, start_date=start_date, end_date=end_date)
-    df = mydb.read_from_sql(f"select * from ashare_daily_ohlc where ts_code='{i}'")
+    df = zh.get_daily(ts_code=i, start_date=start_date, end_date=end_date)
     if df is None:
         continue
     df = df.tail(500)
