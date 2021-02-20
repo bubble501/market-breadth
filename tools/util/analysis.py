@@ -188,11 +188,16 @@ def market_breadth(data, file):
         return None
     cm = sns.diverging_palette(10, 130, as_cmap=True)
     options = {'encoding': "UTF-8"}
+    data = data.dropna()
     data = data.set_index('date')
     data = data.astype(int)
     data.style.apply(_background_gradient, cmap=cm, m=0, M=100)
     html = data.style.apply(_background_gradient, cmap=cm, m=0, M=100).render()
-    imgkit.from_string(html, file, options=options)
+    h = open(file, "w")
+    h.write(html)
+    h.close
+    #import pdb; pdb.set_trace()
+    #imgkit.from_string(html, file, options=options)
 
 
 def recommend(data, index_columns, file):
