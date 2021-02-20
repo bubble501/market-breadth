@@ -53,7 +53,6 @@ class MyDB(object):
         self.mydb.commit()
 
     def read_data(self, table_name, sql_columns):
-        # 记录在表中不存在则进行插入，如果存在则进行更新
         sql = '''
                 SELECT `{}` FROM `{}`;
             '''.format('`,`'.join(sql_columns), table_name)

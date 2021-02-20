@@ -193,9 +193,12 @@ def market_breadth(data, file):
     data = data.astype(int)
     data.style.apply(_background_gradient, cmap=cm, m=0, M=100)
     html = data.style.apply(_background_gradient, cmap=cm, m=0, M=100).render()
-    h = open(file, "w")
+    html_file = file + ".html"
+    jpeg_file = file + ".jpeg"
+    h = open(html_file, "w")
     h.write(html)
-    h.close
+    h.close()
+    imgkit.from_string(html_file, jpeg_file, options=options)
     #import pdb; pdb.set_trace()
     #imgkit.from_string(html, file, options=options)
 
