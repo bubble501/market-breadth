@@ -18,17 +18,22 @@ from task.tools.mydb import mydb
 @click.command()
 @click.option('--market', '-m', default="zh", type=str,
         help="the market which will be used.")  
-def gen_market_breadth(market="zh"):
+@click.option('--ignore', '-i', default="zh", type=str,
+        help="ingore download.")  
+
+def gen_market_breadth(market="zh", ignore="N"):
     config_dict = {}
     if market== 'zh':
-        get_zh_info()
-        get_zh_daily_ohlc()
+        if ignore=="N":
+            get_zh_info()
+            get_zh_daily_ohlc()
         config_dict["zh_stocks_industries_d"] = "zh_stocks_industries"
         config_dict["zh_stocks_sector_sw_d"] = "zh_stocks_sw"
 
     elif market == "us":
-        # get_us_info()
-        get_us_daily_ohlc()
+        if ignore=="N":
+            # get_us_info()
+            get_us_daily_ohlc()
         config_dict["us_stocks_sector_d"] = "us_stocks_sector"
 
     for table, name in config_dict.items():
