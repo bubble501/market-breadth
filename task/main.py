@@ -38,8 +38,9 @@ def gen_market_breadth(market="zh", ignore="N"):
 
     for table, name in config_dict.items():
         df = mydb.read_from_sql(f"SELECT * FROM {table} ORDER BY date desc;")
-        a_mb_name = path + 'data/' + name
-        analysis.market_breadth(df, a_mb_name)
+        a_mb_name = path + 'data/static/' + name
+        html_template = path + 'data/html.template'
+        analysis.market_breadth(df, a_mb_name, html_template)
 
 
 if __name__ == "__main__":

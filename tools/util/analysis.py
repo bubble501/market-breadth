@@ -1,11 +1,15 @@
 # -*- coding:utf-8 -*-
-
+import os
 import talib as ta
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib import colors
+import matplotlib as mpl
+mpl.rcParams['font.sans-serif'] = ['SimHei']
+mpl.rcParams['font.serif'] = ['SimHei']
 import seaborn as sns
+sns.set_style("darkgrid",{"font.sans-serif":['simhei', 'Arial']})
 import imgkit
 
 
@@ -183,7 +187,7 @@ def _background_gradient(s, m, M, cmap='PuBu', low=0, high=0):
     return ['background-color: %s' % color for color in c]
 
 
-def market_breadth(data, file):
+def market_breadth(data, file, template_file):
     if data is None or data.empty:
         return None
     cm = sns.diverging_palette(10, 130, as_cmap=True)
@@ -198,9 +202,18 @@ def market_breadth(data, file):
     h = open(html_file, "w")
     h.write(html)
     h.close()
-    imgkit.from_string(html_file, jpeg_file, options=options)
+    h = open(template_file, "r")
+    template = h.read()
+    h.close()
+    html = template.replace("table_holder", html)
+    h=open(html_file, "w")
+    h.write(html)
+    h.close()
+    
+    os.system(f"/usr/local/bin/wkhtmltoimage {html_file} {jpeg_file}")
+    # imgkit.from_string(html_file, jpeg_file, options=options)
     #import pdb; pdb.set_trace()
-    #imgkit.from_string(html, file, options=options)
+    # imgkit.from_string(html, _file, options=options)
 
 
 def recommend(data, index_columns, file):

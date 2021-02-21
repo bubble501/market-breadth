@@ -16,3 +16,4 @@ PyMySQL
 cryptography
 opendatatools
 html5lib
+Jinja2
