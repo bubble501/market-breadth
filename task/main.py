@@ -12,8 +12,8 @@ from us_get_info import get_us_info
 
 from zh_get_daily import get_zh_daily_ohlc
 from zh_get_info import get_zh_info
-from task.tools.utils import analysis
-from task.tools.mydb import mydb
+from tools.util import analysis
+from tools.mydb import mydb
 
 @click.command()
 @click.option('--market', '-m', default="zh", type=str,

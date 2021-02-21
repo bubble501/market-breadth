@@ -19,7 +19,7 @@ def get_zh_daily_ohlc():
                 select * from zh_stocks_info where ts_code is not null;
             '''
 
-    # start = datetime.now()
+    start = datetime.now()
     stk_info = mydb.read_from_sql(list_sql)
     stk_codes = stk_info.ts_code.copy()
     stk_info = stk_info.set_index(['ts_code'])

@@ -7,3 +7,12 @@ imgkit
 yfinance
 baostock
 mysql-connector-python
+click
+sqlalchemy
+matplotlib
+seaborn
+tushare
+PyMySQL
+cryptography
+opendatatools
+html5lib

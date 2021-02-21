@@ -17,15 +17,17 @@ class MyDB(object):
         self.charset = config.get('database', 'charset')
         self.url = 'mysql+pymysql://{}:{}@{}:{}/{}?charset={}'.format(self.user, self.password, self.host, self.port,
                                                                       self.db, self.charset)
+        self.db_engine = create_engine(self.url)
+        # self.mydb = self.db_engine.connect()
         self.mydb = mycon.connect(
             host=self.host,  # 数据库主机地址
             port=self.port,
             user=self.user,  # 数据库用户名
             password=self.password,  # 数据库密码
             database=self.db,
-            auth_plugin='mysql_native_password'
+            # auth_plugin='mysql_native_password'
         )
-        self.db_engine = create_engine(self.url)
+        #self.db_engine = create_engine(self.url)
 
     # 1. upsert_table 写入或者更新表
     #    table_name ： 写入的表明
